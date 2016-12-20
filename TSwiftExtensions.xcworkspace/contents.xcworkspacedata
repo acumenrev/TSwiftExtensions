@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "group:Extensions"
+      name = "Extensions">
+      <FileRef
+         location = "group:TColorExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TImageExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TStringExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TTableViewExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TUIViewControllerExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:/Users/trivo/Desktop/Work/GithubProject/TSwiftExtensions/Extensions/TUIScreenExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TUIViewExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TUICollectionViewExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TFontExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TDictionaryExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TAttributedStringExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TSwiftyJSONExtension.swift">
+      </FileRef>
+      <FileRef
+         location = "group:TIntExtension.swift">
+      </FileRef>
+   </Group>
+</Workspace>

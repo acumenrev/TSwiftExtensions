@@ -8,74 +8,105 @@
 
 import Foundation
 import UIKit
+import QuartzCore
+
 
 extension UIViewController {
-    private struct TVCExtensionProperties {
-        static var mLblTitle:UILabel? = nil
-        static var mViewTitle:UIView? = nil
+    func setViewControllerTitle(_ title : String, font : UIFont) {
+        self.navigationController?.navigationBar.titleTextAttributes = [NSFontAttributeName : font,
+                                                                        NSForegroundColorAttributeName : UIColor.white]
+        
+        self.title = title
     }
     
-    var mLblTitle : UILabel? {
-        get {
-            return objc_getAssociatedObject(self, &TVCExtensionProperties.mLblTitle) as? UILabel
+    func showAlert(_ title : String, message : String, delegate : AnyObject?, tag : Int, cancelButton: String, ok : String, okHandler:@escaping () -> (), cancelhandler:@escaping () -> ()) {
+        let alertContronoller = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        
+        if cancelButton.length > 0 {
+            let alertAction = UIAlertAction(title: cancelButton, style: .cancel, handler: { (action) in
+                cancelhandler()
+            })
+            
+            alertContronoller.addAction(alertAction)
         }
-        set {
-            if let unwrappedValue = newValue  {
-                objc_setAssociatedObject(self, &TVCExtensionProperties.mLblTitle, unwrappedValue as UILabel?, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        
+        if ok.length > 0 {
+            let alertAction = UIAlertAction(title: ok, style: .default, handler: { (action) in
+                okHandler()
+            })
+            
+            alertContronoller.addAction(alertAction)
+        }
+        
+        let appDelegate = AppDelegate.originDelegate
+        appDelegate?.window?.rootViewController?.present(alertContronoller, animated: true, completion: nil)
+    }
+    
+    /**
+     Show error alert
+     
+     - parameter errorMsg:      Error Msg
+     - parameter delegate:      Delegate
+     - parameter tag:           Tag
+     - parameter cancelTitle:   Cancel title
+     - parameter okTitle:       Ok Title
+     - parameter cancelHandler: Cancel handler
+     - parameter okHandler:     Ok handler
+     */
+    func showErrorAlert(message errorMsg : String, delegate : AnyObject?, tag : Int, cancelTitle : String, okTitle : String = "",
+                        cancelHandler : (() -> ())?,
+                        okHandler : (() -> ())?) {
+        showAlert("Error", message: errorMsg, delegate: delegate, tag: tag, cancelButton: cancelTitle, ok: okTitle, okHandler: {
+            okHandler?()
+        }) {
+            cancelHandler?()
+        }
+    }
+    
+    /**
+     Show no internet alert
+     */
+    func showNoInternetAlert() {
+        let appDelegate = AppDelegate.originDelegate
+        
+        self.showAlert("Error", message: "The internet connection appears to be offline. Please check your network and try again.", delegate: nil, tag: 0, cancelButton: "OK", ok: "", okHandler: {
+            appDelegate?.window?.rootViewController?.dismiss(animated: true, completion: nil)
+        }) {
+            appDelegate?.window?.rootViewController?.dismiss(animated: true, completion: nil)
+        }
+    }
+    
+    /**
+     Set back button with title
+     
+     - parameter title: Title
+     */
+    func setBackButtonWithTitle(_ title : String) {
+        
+        let btnBack = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        self.navigationController?.navigationBar.topItem?.backBarButtonItem = btnBack
+    }
+    
+    
+    /// Get current top view controller
+    var currentTopViewController:UIViewController?{
+        
+        let base = UIApplication.shared.keyWindow?.rootViewController
+        
+        if let nav = base as? UINavigationController {
+            return nav.visibleViewController
+        }
+        
+        if let tab = base as? UITabBarController {
+            if let selected = tab.selectedViewController {
+                return selected
             }
         }
-    }
-    var mViewTitle : UIView? {
-        get {
-            return objc_getAssociatedObject(self, &TVCExtensionProperties.mViewTitle) as? UIView
-        }
-        set {
-            if let unwrappedValue = newValue  {
-                objc_setAssociatedObject(self, &TVCExtensionProperties.mViewTitle, unwrappedValue as UIView?, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-            }
-        }
-    }
-    
-    func setViewTitle(title : String) -> Void {
         
-        if mLblTitle == nil {
-            mViewTitle = UIView();
-            mViewTitle?.frame = CGRectMake(10, 0, UIScreen.mainScreen().bounds.size.width, 40)
-            mViewTitle?.backgroundColor = UIColor.clearColor()
-            
-            
-            mLblTitle = UILabel(forAutoLayout: ())
-            mViewTitle?.addSubview(mLblTitle!)
-            
-            mLblTitle?.autoSetDimension(.Height, toSize: 40)
-            mLblTitle?.autoAlignAxisToSuperviewAxis(.Horizontal)
-            mLblTitle?.autoAlignAxisToSuperviewAxis(.Vertical)
-            
+        if let presented = base?.presentedViewController {
+            return presented
         }
         
-        mLblTitle?.font = UIFont.systemFontOfSize(18)
-        mLblTitle?.backgroundColor = UIColor.clearColor()
-        mLblTitle?.adjustsFontSizeToFitWidth = true
-        mLblTitle?.textAlignment = .Center
-        mLblTitle?.textColor = UIColor.blackColor()
-        
-        let fontDescriptor  = mLblTitle?.font.fontDescriptor().fontDescriptorWithSymbolicTraits(.TraitBold)
-        
-        
-        mLblTitle?.font = UIFont(descriptor: fontDescriptor!, size: 0)
-        self.navigationItem.titleView = mViewTitle
-
-    }
-    
-    func setLeftBarItem() -> Void {
-        self.addLeftBarButtonWithImage(UIImage(named: "icon_menu.png")!)
-        self.navigationItem.leftBarButtonItem?.tintColor = UIColor.blackColor()
-        self.slideMenuController()?.removeLeftGestures()
-        self.slideMenuController()?.addLeftGestures()
-    }
-    
-    func removeLeftBarItem() -> Void {
-        self.navigationItem.leftBarButtonItem = nil
-        self.slideMenuController()?.removeLeftGestures()
+        return base
     }
 }
